@@ -14,4 +14,4 @@ Explique de forma clara e objetiva o que este Pull Request resolve, aprimora ou 
 
 - [ ] Código executado e validado em virtual environment local (`source .venv/bin/activate`).
 - [ ] Suíte de testes unitários passando (`python3 -m unittest discover -s tests`).
-- [ ] Sem conflitos com a branch `master`.
+- [ ] Sem conflitos com a branch `main`.

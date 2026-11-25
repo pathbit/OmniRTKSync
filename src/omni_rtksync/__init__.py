@@ -4,7 +4,7 @@ Specialized token keeper, health validator and auto-healer for the AI gateway
 it is paired with.
 """
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 __author__ = "Eliel Sousa"
 __email__ = "eliel@pathbit.co"
 

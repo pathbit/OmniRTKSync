@@ -1,7 +1,7 @@
 # Authentication
 
 The dashboard is protected by HTTP Basic Auth. Three credential sources are evaluated in a fixed
-order, implemented in [`src/omni_rtksync/auth.py`](https://github.com/pathbit/OmniRTKSync/blob/master/src/omni_rtksync/auth.py)
+order, implemented in [`src/omni_rtksync/auth.py`](https://github.com/pathbit/OmniRTKSync/blob/main/src/omni_rtksync/auth.py)
 and covered by `tests/test_auth_recovery.py`.
 
 ---
