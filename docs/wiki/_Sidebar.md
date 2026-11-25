@@ -18,4 +18,4 @@
 
 ---
 
-Edited in [`docs/wiki/`](https://github.com/pathbit/OmniRTkSync/tree/master/docs/wiki)
+Edited in [`docs/wiki/`](https://github.com/pathbit/OmniRTKSync/tree/master/docs/wiki)

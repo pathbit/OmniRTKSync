@@ -1,4 +1,4 @@
-"""Validação da imagem Docker do OmniRTkSync usando Testcontainers.
+"""Validação da imagem Docker do OmniRTKSync usando Testcontainers.
 
 Garante que a imagem Docker gerada:
 1. Inicializa sem falhas com as configurações padrão.
@@ -45,7 +45,7 @@ def obter_ou_construir_imagem(nome_imagem: str) -> str:
     raise RuntimeError(f"Imagem {nome_imagem} não encontrada e Dockerfile não localizado em {RAIZ}")
 
 
-class TestOmniRTkSyncContainer(unittest.TestCase):
+class TestOmniRTKSyncContainer(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         try:

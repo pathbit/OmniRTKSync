@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "OmniRTKSync"
-version = "1.0.0"
+version = "1.0.1"
 description = "OmniRoute Universal Token & Connection Synchronizer"
 readme = "README.md"
 authors = [
@@ -38,9 +38,9 @@ test = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/pathbit/OmniRTkSync"
-Repository = "https://github.com/pathbit/OmniRTkSync"
-Issues = "https://github.com/pathbit/OmniRTkSync/issues"
+Homepage = "https://github.com/pathbit/OmniRTKSync"
+Repository = "https://github.com/pathbit/OmniRTKSync"
+Issues = "https://github.com/pathbit/OmniRTKSync/issues"
 
 [project.scripts]
 omnirtksync = "omni_rtksync.cli:main"

@@ -100,7 +100,7 @@ Then open **http://localhost:9092**.
 Requires Python 3.11+ (3.14 is what CI pins).
 
 ```bash
-git clone https://github.com/pathbit/OmniRTkSync.git
+git clone https://github.com/pathbit/OmniRTKSync.git
 cd OmniRTKSync
 
 python3 -m venv .venv
@@ -185,7 +185,7 @@ Same for the gateways.
 | OmniRoute | `20128` | `8082` |
 | LiteLLM | `4000` | `8083` |
 | 9RTKSync panel | `9090` | `9091` |
-| OmniRTkSync panel | `9090` | `9092` |
+| OmniRTKSync panel | `9090` | `9092` |
 | LiteLlmRTKSync panel | `9090` | `9093` |
 
 The article stack (`claudegravity`) keeps **`20128`**, 9Router's default port.

@@ -1,10 +1,10 @@
 # OmniRTKSync · OmniRoute Universal Token & Connection Synchronizer
 
-[![CI](https://github.com/pathbit/OmniRTkSync/actions/workflows/ci.yml/badge.svg)](https://github.com/pathbit/OmniRTkSync/actions/workflows/ci.yml)
-[![Release and Docker Package](https://github.com/pathbit/OmniRTkSync/actions/workflows/release.yml/badge.svg)](https://github.com/pathbit/OmniRTkSync/actions/workflows/release.yml)
+[![CI](https://github.com/pathbit/OmniRTKSync/actions/workflows/ci.yml/badge.svg)](https://github.com/pathbit/OmniRTKSync/actions/workflows/ci.yml)
+[![Release and Docker Package](https://github.com/pathbit/OmniRTKSync/actions/workflows/release.yml/badge.svg)](https://github.com/pathbit/OmniRTKSync/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python Version](https://img.shields.io/badge/python-3.14.7-blue.svg)](https://www.python.org/ftp/python/3.14.7/python-3.14.7-macos11.pkg)
-[![Docker Package](https://img.shields.io/badge/docker-ghcr.io%2Fpathbit%2Fomnirtksync-blue)](https://github.com/pathbit/OmniRTkSync/pkgs/container/omnirtksync)
+[![Docker Package](https://img.shields.io/badge/docker-ghcr.io%2Fpathbit%2Fomnirtksync-blue)](https://github.com/pathbit/OmniRTKSync/pkgs/container/omnirtksync)
 
 **`OmniRTKSync`** (*OmniRoute Universal Token & Connection Synchronizer*) is the dedicated connection synchronizer and guardian for the [OmniRoute](https://github.com/diegosouzapw/OmniRoute) gateway. It manages relational credential persistence, proactive OAuth token renewal, and prevents routing outages in artificial intelligence workloads.
 
@@ -110,7 +110,7 @@ same goes for the gateways: each one has its own.
 | OmniRoute | `20128` | `8082` |
 | LiteLLM | `4000` | `8083` |
 | 9RTKSync (dashboard) | `9090` | `9091` |
-| OmniRTkSync (dashboard) | `9090` | `9092` |
+| OmniRTKSync (dashboard) | `9090` | `9092` |
 | LiteLlmRTKSync (dashboard) | `9090` | `9093` |
 
 The article stack (`claudegravity`) keeps **`20128`**, the default 9Router port.
@@ -240,8 +240,8 @@ Following standard environment isolation, local runs strictly use a Python virtu
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/pathbit/OmniRTkSync.git
-cd OmniRTkSync
+git clone https://github.com/pathbit/OmniRTKSync.git
+cd OmniRTKSync
 ```
 
 ### 2. Create and Activate the Virtual Environment
@@ -351,14 +351,14 @@ python3 -m unittest tests/test_container.py -v
 ## Contributing and Branch Protection
 
 * The `master` branch is protected. All contributions must be submitted through Pull Requests and pass all CI checks.
-* For bug reports or new provider requests, please open an issue in [GitHub Issues](https://github.com/pathbit/OmniRTkSync/issues).
+* For bug reports or new provider requests, please open an issue in [GitHub Issues](https://github.com/pathbit/OmniRTKSync/issues).
 * Official upstream gateway: [OmniRoute on GitHub](https://github.com/diegosouzapw/OmniRoute).
 
 ---
 
 ## 📄 License
 
-Distributed under the MIT License. The full text is available in [LICENSE](https://github.com/pathbit/OmniRTkSync/blob/master/LICENSE).
+Distributed under the MIT License. The full text is available in [LICENSE](https://github.com/pathbit/OmniRTKSync/blob/master/LICENSE).
 
 In practice: use, copy, modify, and distribute freely, including commercially, provided that copyright and license notices accompany copies. The software is provided as is, without warranty.
 

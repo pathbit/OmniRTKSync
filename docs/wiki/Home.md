@@ -5,7 +5,7 @@
 credential formats the gateway cannot read, clears stale rate-limit locks, and reports exactly
 why each connection was or was not renewed.
 
-This wiki is generated from [`docs/wiki/`](https://github.com/pathbit/OmniRTkSync/tree/master/docs/wiki)
+This wiki is generated from [`docs/wiki/`](https://github.com/pathbit/OmniRTKSync/tree/master/docs/wiki)
 in the main repository. Edit the files there and open a pull request — a push to `master`
 republishes these pages automatically. Editing a page directly here will be overwritten.
 
@@ -93,6 +93,6 @@ Full detail in [Authentication](Authentication).
 
 ## License
 
-MIT — see [LICENSE](https://github.com/pathbit/OmniRTkSync/blob/master/LICENSE).
+MIT — see [LICENSE](https://github.com/pathbit/OmniRTKSync/blob/master/LICENSE).
 
 Built by [Pathbit](https://pathbit.co/).

@@ -2,7 +2,7 @@
 
 *(Versão em português disponível na segunda metade desta página.)*
 
-Complete guide to deploying **OmniRTkSync** and **OmniRoute** via Docker and Docker Compose, including token optimization with **Headroom** and **Caveman**, remote access via **Cloudflare Tunnel** and **Tailscale**, and automated container package retention.
+Complete guide to deploying **OmniRTKSync** and **OmniRoute** via Docker and Docker Compose, including token optimization with **Headroom** and **Caveman**, remote access via **Cloudflare Tunnel** and **Tailscale**, and automated container package retention.
 
 ---
 
@@ -50,7 +50,7 @@ docker run -d \
 
 ## 3. Production Deployment with Docker Compose
 
-The standard production setup runs OmniRoute (gateway) and OmniRTkSync (synchronizer) on an isolated internal management network (`omnirtksync-net`), with optional shared inference networking (`rtk-inference-net`).
+The standard production setup runs OmniRoute (gateway) and OmniRTKSync (synchronizer) on an isolated internal management network (`omnirtksync-net`), with optional shared inference networking (`rtk-inference-net`).
 
 ### Step 1: Initialize Configuration
 
@@ -70,7 +70,7 @@ docker compose -f docker-compose.example.yml up -d
 | Service | Container Name | Internal Port | Host Published Port | Purpose |
 | :--- | :--- | :--- | :--- | :--- |
 | **OmniRoute** | `omnirtk-router` | `20128` | `127.0.0.1:8082` | Gateway API & Admin |
-| **OmniRTkSync** | `omnirtk-sync` | `9090` | `127.0.0.1:9092` | Guardian Dashboard & Healthz |
+| **OmniRTKSync** | `omnirtk-sync` | `9090` | `127.0.0.1:9092` | Guardian Dashboard & Healthz |
 | **Headroom** *(optional)* | `omnirtk-headroom` | `8787` | `127.0.0.1:8787` | Token Compression Proxy |
 
 Dashboard access: **http://localhost:9092**
@@ -105,7 +105,7 @@ AI coding agents (such as **Claude Code**, **Cursor**, **Windsurf**, and **Roo C
 └───────────────▲────────────────┘
                 │
 ┌───────────────┴────────────────┐
-│  OmniRTkSync (Guardian: 9092) │  <-- OAuth renewal & rate-limit healing
+│  OmniRTKSync (Guardian: 9092) │  <-- OAuth renewal & rate-limit healing
 └────────────────────────────────┘
 ```
 
@@ -213,7 +213,7 @@ The synchronizer exposes `/healthz` on port 9090 (host 9092):
 
 # Guia de Implantação via Docker e Docker Compose
 
-Guia completo para implantar o **OmniRTkSync** e o **OmniRoute** via Docker e Docker Compose, com otimização de tokens via **Headroom** e **Caveman**, acesso remoto seguro via **Cloudflare Tunnel** e **Tailscale**, e retenção automatizada de imagens no GitHub Packages.
+Guia completo para implantar o **OmniRTKSync** e o **OmniRoute** via Docker e Docker Compose, com otimização de tokens via **Headroom** e **Caveman**, acesso remoto seguro via **Cloudflare Tunnel** e **Tailscale**, e retenção automatizada de imagens no GitHub Packages.
 
 ## 1. Pacotes Oficiais e Política de Retenção de 3 Versões
 

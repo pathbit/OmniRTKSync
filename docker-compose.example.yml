@@ -224,7 +224,7 @@ networks:
   # POR QUE SAO DUAS REDES
   #
   # A de cima e de GESTAO e continua isolada: so o sincronizador desta stack
-  # fala com este gateway. E isso que garante que o painel do OmniRTkSync
+  # fala com este gateway. E isso que garante que o painel do OmniRTKSync
   # nunca leia, sem querer, o gateway do irmao -- antes, com todos na rede
   # default, o mesmo nome curto resolvia para stacks diferentes e ninguem
   # sabia a qual gateway o painel estava conectado. Nao desfaca.
