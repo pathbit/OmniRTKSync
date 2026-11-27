@@ -3,6 +3,7 @@
 import argparse
 import os
 import signal
+import sqlite3
 import sys
 import threading
 import time
@@ -456,6 +457,9 @@ def main():
     args = parser.parse_args()
     settings = Settings.from_env()
 
+    if args.db_path:
+        settings.db_path = args.db_path
+
     # Log em arquivo precisa existir antes de qualquer evento do motor de sincronizacao.
     logger = setup_logging(settings.db_path)
 
@@ -473,8 +477,6 @@ def main():
             settings.get_recovery_file_path(),
         )
 
-    if args.db_path:
-        settings.db_path = args.db_path
     if args.interval:
         settings.sync_interval = args.interval
         # O agendador le cron_interval, ja derivado do ambiente antes de as
@@ -497,7 +499,17 @@ def main():
 
     if args.once:
         engine = OmniSyncEngine(settings)
-        res = engine.sync_all()
+        try:
+            res = engine.sync_all()
+        except sqlite3.Error as error:
+            print(f"[ERROR] Could not read or update the SQLite database: {error}", file=sys.stderr)
+            raise SystemExit(1) from None
+        if not res["success"]:
+            print("[ERROR] One or more connections could not be synchronized. Check the log.", file=sys.stderr)
+            raise SystemExit(1)
+        if res.get("waiting_for_gateway"):
+            print("[*] Waiting for the gateway to create its database.")
+            return
         print(f"[*] Sincronização do {NOME_DO_GATEWAY} concluída: {res.get('total', 0)} conexões inspecionadas, {res.get('refreshed', 0)} renovadas.")
         return
 

@@ -25,7 +25,7 @@ class TestOmniWebAuth(unittest.TestCase):
         cls.settings = Settings(
             db_path=cls.db_path,
             web_host="127.0.0.1",
-            web_port=19197,
+            web_port=0,
             dashboard_user="admin",
             dashboard_password="testpassword",
         )
@@ -35,6 +35,7 @@ class TestOmniWebAuth(unittest.TestCase):
             db_path=cls.settings.db_path,
             settings=cls.settings,
         )
+        cls.settings.web_port = cls.server.server_port
 
     @classmethod
     def tearDownClass(cls):

@@ -5,7 +5,6 @@ import json
 import os
 import sqlite3
 import tempfile
-import time
 import unittest
 import urllib.error
 import urllib.request
@@ -20,9 +19,6 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         return None
 
-
-PORT = 19394
-BASE = f"http://127.0.0.1:{PORT}"
 
 ACCESS_TOKEN = "ya29.SEGREDO-DE-ACESSO-NAO-PODE-VAZAR"
 REFRESH_TOKEN = "1//SEGREDO-DE-REFRESH-NAO-PODE-VAZAR"
@@ -58,14 +54,14 @@ class TestWebSecurity(unittest.TestCase):
         cls.settings = Settings(
             db_path=cls.db_path,
             web_host="127.0.0.1",
-            web_port=PORT,
+            web_port=0,
             dashboard_user="admin",
             dashboard_password="senha-de-teste",
         )
         cls.server = web_server.start_web_server(
-            "127.0.0.1", PORT, cls.db_path, omniroute_url="", settings=cls.settings
+            "127.0.0.1", 0, cls.db_path, omniroute_url="", settings=cls.settings
         )
-        time.sleep(0.3)
+        cls.base_url = f"http://127.0.0.1:{cls.server.server_port}"
 
     @classmethod
     def tearDownClass(cls):
@@ -79,7 +75,7 @@ class TestWebSecurity(unittest.TestCase):
 
     def post(self, path, headers=None, body=b"idioma=pt"):
         """Dispara o POST sem seguir o redirecionamento, para inspecionar a resposta."""
-        req = urllib.request.Request(f"{BASE}{path}", data=body, method="POST")
+        req = urllib.request.Request(f"{self.base_url}{path}", data=body, method="POST")
         for key, value in self.auth_header().items():
             req.add_header(key, value)
         for key, value in (headers or {}).items():
@@ -125,7 +121,7 @@ class TestWebSecurity(unittest.TestCase):
         self.assertAccepted(self.post("/acoes/idioma", {"Sec-Fetch-Site": "none"}))
 
     def test_matching_origin_is_accepted(self):
-        self.assertAccepted(self.post("/acoes/idioma", {"Origin": BASE}))
+        self.assertAccepted(self.post("/acoes/idioma", {"Origin": self.base_url}))
 
     def test_non_browser_client_is_accepted(self):
         """curl e scripts nao mandam nenhum dos dois cabecalhos e nao tem sessao a sequestrar."""
@@ -148,13 +144,13 @@ class TestWebSecurity(unittest.TestCase):
 
     def test_a_matching_origin_wins_over_an_unexpected_fetch_site(self):
         self.assertAccepted(
-            self.post("/acoes/idioma", {"Origin": BASE, "Sec-Fetch-Site": "valor-inesperado"})
+            self.post("/acoes/idioma", {"Origin": self.base_url, "Sec-Fetch-Site": "valor-inesperado"})
         )
 
     # --- Vazamento de segredo ----------------------------------------------
 
     def test_api_status_never_returns_credentials(self):
-        req = urllib.request.Request(f"{BASE}/api/status")
+        req = urllib.request.Request(f"{self.base_url}/api/status")
         for key, value in self.auth_header().items():
             req.add_header(key, value)
         with urllib.request.urlopen(req, timeout=5) as resp:
@@ -172,7 +168,7 @@ class TestWebSecurity(unittest.TestCase):
             self.assertNotIn(forbidden, connection)
 
     def test_dashboard_html_never_returns_credentials(self):
-        req = urllib.request.Request(BASE + "/")
+        req = urllib.request.Request(self.base_url + "/")
         for key, value in self.auth_header().items():
             req.add_header(key, value)
         with urllib.request.urlopen(req, timeout=5) as resp:
@@ -184,7 +180,7 @@ class TestWebSecurity(unittest.TestCase):
     def test_the_401_body_never_teaches_the_credentials(self):
         """A resposta de autenticacao nao pode ensinar a senha a quem ainda nao entrou."""
         try:
-            urllib.request.urlopen(f"{BASE}/", timeout=5)
+            urllib.request.urlopen(f"{self.base_url}/", timeout=5)
             self.fail("deveria exigir autenticacao")
         except urllib.error.HTTPError as e:
             self.assertEqual(e.code, 401)
@@ -194,7 +190,7 @@ class TestWebSecurity(unittest.TestCase):
             self.assertNotIn(leak, body)
 
     def test_no_page_prints_a_live_credential(self):
-        req = urllib.request.Request(BASE + "/")
+        req = urllib.request.Request(self.base_url + "/")
         for key, value in self.auth_header().items():
             req.add_header(key, value)
         with urllib.request.urlopen(req, timeout=5) as resp:
@@ -206,9 +202,6 @@ class TestWebSecurity(unittest.TestCase):
 class TestSecurityHeadersOnEveryResponse(unittest.TestCase):
     """Sobe o proprio servidor: o unittest ordena as classes pelo nome e esta
     roda antes de TestWebSecurity, que e quem monta o outro fixture."""
-
-    PORTA = PORT + 1
-    ORIGEM = f"http://127.0.0.1:{PORT + 1}"
 
     @classmethod
     def setUpClass(cls):
@@ -225,15 +218,15 @@ class TestSecurityHeadersOnEveryResponse(unittest.TestCase):
         cls.settings = Settings(
             db_path=cls.db_path,
             web_host="127.0.0.1",
-            web_port=cls.PORTA,
+            web_port=0,
             dashboard_user="admin",
             dashboard_password="senha-de-teste",
             validate_credentials=False,
         )
         cls.server = web_server.start_web_server(
-            "127.0.0.1", cls.PORTA, cls.db_path, omniroute_url="", settings=cls.settings
+            "127.0.0.1", 0, cls.db_path, omniroute_url="", settings=cls.settings
         )
-        time.sleep(0.3)
+        cls.base_url = f"http://127.0.0.1:{cls.server.server_port}"
 
     @classmethod
     def tearDownClass(cls):
@@ -257,7 +250,7 @@ class TestSecurityHeadersOnEveryResponse(unittest.TestCase):
     )
 
     def headers_de(self, path, autenticado=True):
-        req = urllib.request.Request(f"{self.ORIGEM}{path}")
+        req = urllib.request.Request(f"{self.base_url}{path}")
         if autenticado:
             raw = base64.b64encode(b"admin:senha-de-teste").decode()
             req.add_header("Authorization", f"Basic {raw}")
