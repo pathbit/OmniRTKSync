@@ -21,8 +21,8 @@ This page does the three things that can honestly be done instead:
    like it.
 
 For the routing, credential and egress side of the same accounts, see
-[Architecture](Architecture), [Authentication](Authentication) and
-[Egress and Multi-Session](Egress-And-Multi-Session).
+[Architecture](Architecture.md), [Authentication](Authentication.md) and
+[Egress and Multi-Session](Egress-And-Multi-Session.md).
 
 ---
 
@@ -290,7 +290,7 @@ presence as "limited" left a connection yellow forever after its first 429.
 When the deadline is still in the future, `health_status` returns
 `rate_limited`, which the panel paints as the **Rate limited** badge in the
 health column of the connections table (`src/omni_rtksync/i18n.py:92`,
-`src/omni_rtksync/render.py:36`). See [Dashboard](Dashboard) for where that
+`src/omni_rtksync/render.py:36`). See [Dashboard](Dashboard.md) for where that
 column sits.
 
 **The counter that closes the loop.** When the deadline passes, the sync clears
@@ -619,8 +619,8 @@ every account registered: several sessions on one account draw no attention, but
 several accounts leaving through one address do. OmniRoute models the fix as a
 per-account egress binding, and a pool that is inactive or missing its address
 fails silently back to the host's — the whole of
-[Egress and Multi-Session](Egress-And-Multi-Session) is about that, and
-[Egress Testing](Egress-Testing) is the bench that proves where traffic really
+[Egress and Multi-Session](Egress-And-Multi-Session.md) is about that, and
+[Egress Testing](Egress-Testing.md) is the bench that proves where traffic really
 leaves from.
 
 ---
@@ -651,7 +651,7 @@ not a shortage of quota: `expires_at` is a TEXT column that OmniRoute reads with
 gateway concludes the connection has no known expiry, and proactive renewal
 stops for that connection. The synchronizer writes ISO-8601 there, the gateway's
 own native format (`src/omni_rtksync/gateway.py:209-243`). **Neither clock
-belongs in the capacity formula.** [Upstream Fixes](Upstream-Fixes) has the
+belongs in the capacity formula.** [Upstream Fixes](Upstream-Fixes.md) has the
 gateway-side story of that parsing bug.
 
 ---
@@ -861,7 +861,7 @@ provedor reabre, e tratar a presença do campo como "limitada" deixava a conexã
 amarela para sempre depois do primeiro 429. Com o prazo no futuro, o
 `health_status` vira `rate_limited` e a tela pinta o badge **Rate limit** na
 coluna de saúde da tabela de conexões (`src/omni_rtksync/i18n.py:206`,
-`src/omni_rtksync/render.py:36`). Onde essa coluna fica: [Dashboard](Dashboard).
+`src/omni_rtksync/render.py:36`). Onde essa coluna fica: [Dashboard](Dashboard.md).
 
 **O contador que fecha o laço.** Vencido o prazo, o sincronizador limpa a trava e
 registra `Trava de rate limit vencida removida`
@@ -1062,8 +1062,8 @@ as contas cadastradas: várias sessões na mesma conta não incomodam; o que cha
 atenção é o inverso, várias contas saindo pelo mesmo endereço. O OmniRoute modela
 o remédio como vínculo de saída por conta, e um pool inativo ou sem endereço cai
 em silêncio para o endereço do host — é disso que trata
-[Egress and Multi-Session](Egress-And-Multi-Session), e
-[Egress Testing](Egress-Testing) é a bancada que prova por onde o tráfego sai de
+[Egress and Multi-Session](Egress-And-Multi-Session.md), e
+[Egress Testing](Egress-Testing.md) é a bancada que prova por onde o tráfego sai de
 verdade.
 
 ## Renovação de credencial não é quota
@@ -1090,7 +1090,7 @@ gravado como texto vira data inválida, o gateway conclui que a conexão não te
 expiração conhecida e para de renovar preventivamente. O sincronizador grava
 ISO-8601, o formato nativo do próprio gateway
 (`src/omni_rtksync/gateway.py:209-243`). **Nenhum dos dois relógios entra na
-fórmula.** O [Upstream Fixes](Upstream-Fixes) conta o lado do gateway nesse bug
+fórmula.** O [Upstream Fixes](Upstream-Fixes.md) conta o lado do gateway nesse bug
 de parsing.
 
 ## Para reproduzir

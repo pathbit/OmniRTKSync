@@ -67,7 +67,7 @@ A cycle with nothing to do shows as exactly that, rather than an empty screen yo
 about.
 
 The in-memory history keeps the last cycles; the durable record is the file log
-(see [Logging](Logging)).
+(see [Logging](Logging.md)).
 
 ---
 
@@ -103,7 +103,7 @@ of being assumed healthy.
 - `/api/status` no longer sends `Access-Control-Allow-Origin: *`.
 - Publish the port on `127.0.0.1` only.
 
-More in [Authentication](Authentication).
+More in [Authentication](Authentication.md).
 
 ---
 
