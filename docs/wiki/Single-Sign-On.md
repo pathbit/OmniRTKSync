@@ -34,7 +34,7 @@ provider and having it come back to an address you registered there in advance. 
 changes, every sign-in attempt ends with the provider refusing to come back.
 
 This rules out the Cloudflare quick tunnel, which gets a brand new hostname on every start — see
-[Remote Access](Remote-Access). Use one of:
+[Remote Access](Remote-Access.md). Use one of:
 
 - a **named** Cloudflare tunnel, with a hostname you own;
 - **Tailscale**, using the stable machine name on your tailnet;
@@ -131,7 +131,7 @@ In order of how little you have to do:
 1. **Just sign in with your password.** The form is right there. This is the answer almost every
    time, and it is why the form never goes away.
 2. **The recovery credential still works.** `admin` plus the recovery hash gets in whatever the
-   state of the provider, exactly as described in [Authentication](Authentication).
+   state of the provider, exactly as described in [Authentication](Authentication.md).
 3. **Scripts and monitoring never noticed.** Anything that does not ask for HTML — `curl`, cron,
    your uptime check — authenticates the way it always did. Federated sign-in only ever applies to
    the browser door.
@@ -210,7 +210,7 @@ In Keycloak, create a SAML client with the panel entity ID at `/sso/saml/metadat
 | The trip state | a short-lived signed cookie, plus a consumed-state list in memory | it dies in ten minutes and grants nothing on its own |
 
 The data directory is the one the rest of the panel already uses — see `DATA_DIR` in
-[Configuration](Configuration).
+[Configuration](Configuration.md).
 
 ---
 ---
@@ -235,7 +235,7 @@ navegador ao provedor e fazendo-o voltar a um endereço que você registrou lá 
 endereço muda, toda tentativa de entrar termina com o provedor recusando a volta.
 
 Isso descarta o túnel rápido da Cloudflare, que ganha um nome novo a cada subida — veja
-[Remote Access](Remote-Access). Use uma destas opções:
+[Remote Access](Remote-Access.md). Use uma destas opções:
 
 - um túnel Cloudflare **nomeado**, com um nome que é seu;
 - **Tailscale**, com o nome estável da máquina na sua tailnet;
@@ -333,7 +333,7 @@ Em ordem de quão pouco você precisa fazer:
 1. **Entre com a senha, simplesmente.** O formulário está ali. É a resposta quase sempre, e é por
    isso que ele nunca sai da tela.
 2. **A credencial de recuperação continua valendo.** `admin` mais o hash de recuperação entra
-   qualquer que seja o estado do provedor, como descrito em [Authentication](Authentication).
+   qualquer que seja o estado do provedor, como descrito em [Authentication](Authentication.md).
 3. **Scripts e monitoramento nem perceberam.** Tudo que não pede HTML — `curl`, cron, seu
    monitor de disponibilidade — autentica como sempre autenticou. A entrada federada vale só para a
    porta do navegador.
@@ -412,4 +412,4 @@ No Keycloak, crie um cliente SAML com o Entity ID do painel em `/sso/saml/metada
 | O estado da ida | cookie assinado de vida curta, mais uma lista de estados consumidos em memória | morre em dez minutos e sozinho não dá acesso a nada |
 
 O diretório de dados é o mesmo que o resto do painel já usa — veja `DATA_DIR` em
-[Configuration](Configuration).
+[Configuration](Configuration.md).

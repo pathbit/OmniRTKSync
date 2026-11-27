@@ -89,7 +89,7 @@ Two conventions matter:
 
 The sibling project targets a JSON-column schema where a number survives the round-trip, and the
 rules are the opposite. Getting this wrong silently disables the gateway's proactive refresh —
-see [Upstream Fixes](Upstream-Fixes).
+see [Upstream Fixes](Upstream-Fixes.md).
 
 ---
 

@@ -46,7 +46,7 @@ out and produce `BrokenPipeError` in the logs.
 
 > **A token is only renewed inside the margin.** With the defaults, a token with 24 minutes left
 > is *not* renewed, because 24 min > 15 min. That is correct behavior, not a failure — the
-> dashboard states the reason per connection. See [Troubleshooting](Troubleshooting).
+> dashboard states the reason per connection. See [Troubleshooting](Troubleshooting.md).
 
 ---
 
@@ -73,7 +73,7 @@ source of truth: the `.dashboard_auth.json` file written by the screen is ignore
 the password from the panel answers `409 Conflict`. Comment both variables out to hand control
 back to the dashboard.
 
-Full rules in [Authentication](Authentication).
+Full rules in [Authentication](Authentication.md).
 
 ---
 
@@ -86,7 +86,7 @@ Full rules in [Authentication](Authentication).
 | `LOG_LEVEL` | `INFO` | `DEBUG`, `INFO`, `WARNING` or `ERROR`. |
 | `LOG_TO_STDOUT` | `1` | `0` stops mirroring events on the container stdout. |
 
-Details in [Logging](Logging).
+Details in [Logging](Logging.md).
 
 ---
 
