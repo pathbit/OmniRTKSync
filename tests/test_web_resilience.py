@@ -34,14 +34,14 @@ class TestHealthzResilience(unittest.TestCase):
         cls.settings = Settings(
             db_path=cls.db_path,
             web_host="127.0.0.1",
-            web_port=19391,
+            web_port=0,
             dashboard_user="admin",
             dashboard_password="senha-de-teste",
         )
         cls.server = web_server.start_web_server(
-            "127.0.0.1", 19391, cls.db_path, omniroute_url="", settings=cls.settings
+            "127.0.0.1", 0, cls.db_path, omniroute_url="", settings=cls.settings
         )
-        time.sleep(0.3)
+        cls.base_url = f"http://127.0.0.1:{cls.server.server_port}"
 
     @classmethod
     def tearDownClass(cls):
@@ -58,7 +58,7 @@ class TestHealthzResilience(unittest.TestCase):
         self.assertTrue(self.server.daemon_threads)
 
     def test_healthz_responds_ok(self):
-        with urllib.request.urlopen("http://127.0.0.1:19391/healthz", timeout=5) as resp:
+        with urllib.request.urlopen(f"{self.base_url}/healthz", timeout=5) as resp:
             self.assertEqual(resp.status, 200)
             self.assertEqual(resp.read(), b"OK")
 
@@ -67,7 +67,7 @@ class TestHealthzResilience(unittest.TestCase):
         servidor levantava NameError depois de escrever a resposta: o cliente ja
         tinha recebido tudo. Content-Length prova que houve uma unica resposta
         completa, montada antes de qualquer escrita."""
-        with urllib.request.urlopen(f"http://127.0.0.1:{19391}/healthz", timeout=5) as resp:
+        with urllib.request.urlopen(f"{self.base_url}/healthz", timeout=5) as resp:
             body = resp.read()
             self.assertEqual(resp.status, 200)
             self.assertEqual(body, b"OK")
@@ -78,14 +78,14 @@ class TestHealthzResilience(unittest.TestCase):
         """Uma excecao apos a resposta nao aparece para o cliente, so no log do
         container. Sondar duas vezes garante que o handler termina inteiro."""
         for _ in range(2):
-            with urllib.request.urlopen(f"http://127.0.0.1:{19391}/healthz", timeout=5) as resp:
+            with urllib.request.urlopen(f"{self.base_url}/healthz", timeout=5) as resp:
                 self.assertEqual(resp.status, 200)
         self.assertGreater(self.server.socket.fileno(), 0)
 
     def test_client_disconnect_does_not_crash_the_server(self):
         """O probe do Docker fecha o socket cedo; isso não pode virar traceback nem derrubar o servidor."""
         for _ in range(5):
-            s = socket.create_connection(("127.0.0.1", 19391), timeout=5)
+            s = socket.create_connection(("127.0.0.1", self.server.server_port), timeout=5)
             s.sendall(b"GET /healthz HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n")
             # Fecha imediatamente, sem ler a resposta: é exatamente o que produzia
             # BrokenPipeError: [Errno 32] em serve_healthz.
@@ -94,7 +94,7 @@ class TestHealthzResilience(unittest.TestCase):
         time.sleep(0.3)
 
         # O servidor tem que continuar atendendo normalmente depois disso.
-        with urllib.request.urlopen("http://127.0.0.1:19391/healthz", timeout=5) as resp:
+        with urllib.request.urlopen(f"{self.base_url}/healthz", timeout=5) as resp:
             self.assertEqual(resp.status, 200)
 
     def test_concurrent_requests_are_served_in_parallel(self):
@@ -102,7 +102,7 @@ class TestHealthzResilience(unittest.TestCase):
 
         def hit():
             try:
-                with urllib.request.urlopen("http://127.0.0.1:19391/healthz", timeout=5) as r:
+                with urllib.request.urlopen(f"{self.base_url}/healthz", timeout=5) as r:
                     results.append(r.status)
             except Exception as e:  # pragma: no cover - falha explícita no assert abaixo
                 results.append(str(e))

@@ -1,6 +1,9 @@
 """Testes unitários da CLI do OmniRTKSync."""
 
+from contextlib import redirect_stderr, redirect_stdout
+import io
 import os
+from pathlib import Path
 import sqlite3
 import tempfile
 import unittest
@@ -84,6 +87,55 @@ class TestOmniCLI(unittest.TestCase):
     def test_cli_main_once(self):
         with patch("sys.argv", ["OmniRTKSync", "--db-path", self.db_path, "--once"]):
             main()
+
+    def test_one_shot_reports_an_invalid_database(self):
+        database = Path(self.temp_dir.name) / "invalid.sqlite"
+        database.write_text("invalid SQLite file", encoding="utf-8")
+        args = ["omnirtksync", "--db-path", str(database), "--once", "--no-web"]
+        with patch("sys.argv", args), redirect_stderr(io.StringIO()) as stderr:
+            with self.assertRaises(SystemExit) as exit_signal:
+                main()
+        self.assertEqual(exit_signal.exception.code, 1)
+        self.assertIn("SQLite database", stderr.getvalue())
+
+    def test_one_shot_reports_that_the_gateway_has_not_created_the_database(self):
+        database = Path(self.temp_dir.name) / "absent.sqlite"
+        args = ["omnirtksync", "--db-path", str(database), "--once", "--no-web"]
+        with patch("sys.argv", args), redirect_stdout(io.StringIO()) as stdout:
+            main()
+        self.assertIn("Waiting for the gateway", stdout.getvalue())
+        self.assertFalse(database.exists())
+
+    def test_one_shot_returns_failure_if_a_connection_cannot_be_synchronized(self):
+        args = ["omnirtksync", "--db-path", self.db_path, "--once", "--no-web"]
+        with patch("sys.argv", args), patch.object(OmniSyncEngine, "sync_all", return_value={"success": False}):
+            with redirect_stderr(io.StringIO()) as stderr, self.assertRaises(SystemExit) as exit_signal:
+                main()
+        self.assertEqual(exit_signal.exception.code, 1)
+        self.assertIn("could not be synchronized", stderr.getvalue())
+
+    def test_database_argument_selects_logging_and_recovery_directory(self):
+        requested_directory = Path(self.db_path).parent
+        environment_directory = requested_directory / "environment"
+        environment_directory.mkdir()
+        env = {
+            "DB_PATH": str(environment_directory / "storage.sqlite"),
+            "DATA_DIR": "",
+            "DASHBOARD_RECOVERY_HASH": "",
+        }
+        args = ["omnirtksync", "--db-path", self.db_path, "--status"]
+        with patch.dict(os.environ, env), patch("sys.argv", args), patch(
+            "omni_rtksync.cli.setup_logging"
+        ) as setup_logging:
+            main()
+
+        setup_logging.assert_called_once_with(self.db_path)
+        recovery_file = requested_directory / ".dashboard_recovery"
+        self.assertTrue(recovery_file.is_file())
+        self.assertFalse((environment_directory / recovery_file.name).exists())
+        logged_arguments = setup_logging.return_value.warning.call_args.args
+        self.assertEqual(logged_arguments[-1], str(recovery_file))
+        self.assertNotIn(recovery_file.read_text(encoding="utf-8").strip(), str(logged_arguments))
 
 
 if __name__ == "__main__":

@@ -45,8 +45,6 @@ from omni_rtksync.config import Settings
 from omni_rtksync.prefs import resolve_prefs_path
 from omni_rtksync.web import start_web_server
 
-PORTA = 19291
-PAINEL = f"http://127.0.0.1:{PORTA}"
 ISSUER = "https://idp.exemplo.com"
 CLIENT_ID = "cliente-do-painel"
 SEGREDO_DO_CLIENTE = "segredo-que-nunca-aparece-na-tela"
@@ -182,7 +180,7 @@ class BaseDeSSO(unittest.TestCase):
         cls.settings = Settings(
             db_path=cls.db_path,
             web_host="127.0.0.1",
-            web_port=PORTA,
+            web_port=0,
             dashboard_user="admin",
             dashboard_password=SENHA_LOCAL,
         )
@@ -194,8 +192,9 @@ class BaseDeSSO(unittest.TestCase):
         cls.prefs_path = resolve_prefs_path(os.path.dirname(cls.db_path))
         cls.arquivo_do_segredo = sso.caminho_do_segredo(os.path.dirname(cls.db_path))
         cls.server = start_web_server(
-            host="127.0.0.1", port=PORTA, db_path=cls.db_path, settings=cls.settings
+            host="127.0.0.1", port=0, db_path=cls.db_path, settings=cls.settings
         )
+        cls.panel_url = f"http://127.0.0.1:{cls.server.server_port}"
 
     @classmethod
     def tearDownClass(cls):
@@ -255,7 +254,7 @@ class BaseDeSSO(unittest.TestCase):
     def liga_sso(self, **mudancas):
         campos = {
             "enabled": "oidc",
-            "base_url": PAINEL,
+            "base_url": self.panel_url,
             "oidc_issuer": ISSUER,
             "oidc_client_id": CLIENT_ID,
             "oidc_scopes": "openid email profile",
@@ -269,7 +268,7 @@ class BaseDeSSO(unittest.TestCase):
     # -- conversa HTTP ----------------------------------------------------
 
     def pede(self, metodo, caminho, cabecalhos=None, corpo=None) -> Resposta:
-        conexao = http.client.HTTPConnection("127.0.0.1", PORTA, timeout=10)
+        conexao = http.client.HTTPConnection("127.0.0.1", self.server.server_port, timeout=10)
         try:
             conexao.request(metodo, caminho, body=corpo, headers=cabecalhos or {})
             resposta = conexao.getresponse()
@@ -388,7 +387,7 @@ class TestIdaAoProvedor(BaseDeSSO):
             cabecalhos=self.como_navegador({"Host": "atacante.exemplo"}),
         )
         parametros = parse_qs(urlparse(ida.cabecalho("Location")).query)
-        self.assertEqual(parametros["redirect_uri"], [PAINEL + "/sso/oidc/callback"])
+        self.assertEqual(parametros["redirect_uri"], [self.panel_url + "/sso/oidc/callback"])
         self.assertNotIn("atacante", ida.cabecalho("Location"))
 
     def test_o_botao_de_sso_aparece_no_formulario_sem_substitui_lo(self):
@@ -459,7 +458,7 @@ class TestVoltaDoProvedor(BaseDeSSO):
         state, cookie = self.estado_da_ida(ida)
         self.volta(state, cookie, host="atacante.exemplo")
         enviado = self.provedor.pedidos_de_token[0]["campos"]["redirect_uri"]
-        self.assertEqual(enviado, [PAINEL + "/sso/oidc/callback"])
+        self.assertEqual(enviado, [self.panel_url + "/sso/oidc/callback"])
 
     def test_a_troca_autentica_o_cliente_por_basic(self):
         self.fluxo_completo()
@@ -689,7 +688,7 @@ class TestConfiguracao(BaseDeSSO):
         corpo = {
             "senha_local": SENHA_LOCAL,
             "enabled": "oidc",
-            "base_url": PAINEL,
+            "base_url": self.panel_url,
             "oidc_issuer": ISSUER,
             "oidc_client_id": CLIENT_ID,
             "oidc_scopes": "openid email profile",
@@ -703,8 +702,8 @@ class TestConfiguracao(BaseDeSSO):
             cabecalhos={
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Cookie": cookie,
-                "Origin": PAINEL,
-                "Host": f"127.0.0.1:{PORTA}",
+                "Origin": self.panel_url,
+                "Host": f"127.0.0.1:{self.server.server_port}",
             },
             corpo=urlencode(corpo),
         )
@@ -737,11 +736,11 @@ class TestConfiguracao(BaseDeSSO):
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Cookie": cookie,
                 "Origin": "https://atacante.exemplo",
-                "Host": f"127.0.0.1:{PORTA}",
+                "Host": f"127.0.0.1:{self.server.server_port}",
             },
             corpo=urlencode({
                 "senha_local": SENHA_LOCAL, "enabled": "oidc",
-                "base_url": PAINEL, "oidc_issuer": "https://hostil.exemplo",
+                "base_url": self.panel_url, "oidc_issuer": "https://hostil.exemplo",
                 "oidc_client_id": "do-atacante", "allowed_emails": "atacante@hostil.exemplo",
             }),
         )

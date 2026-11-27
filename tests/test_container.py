@@ -8,9 +8,12 @@ Garante que a imagem Docker gerada:
 5. Permite executar a CLI (omnirtksync --help) com sucesso dentro do container.
 """
 
+from contextlib import closing
 import os
+import sys
 import time
 import unittest
+from unittest.mock import Mock, patch
 import urllib.request
 import urllib.error
 
@@ -18,20 +21,7 @@ RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOCKER_IMAGE_PADRAO = "omnirtksync:test"
 
 
-def docker_disponivel() -> bool:
-    try:
-        import docker
-        cliente = docker.from_env()
-        cliente.ping()
-        return True
-    except Exception:
-        return False
-
-
-def obter_ou_construir_imagem(nome_imagem: str) -> str:
-    import docker
-
-    cliente = docker.from_env()
+def obter_ou_construir_imagem(cliente, nome_imagem: str) -> str:
     imagens = cliente.images.list(name=nome_imagem)
     if imagens:
         return nome_imagem
@@ -48,20 +38,23 @@ def obter_ou_construir_imagem(nome_imagem: str) -> str:
 class TestOmniRTKSyncContainer(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        requested_image = os.environ.get("TEST_DOCKER_IMAGE")
         try:
             import testcontainers
             import docker
-        except ImportError:
-            raise unittest.SkipTest("testcontainers ou docker não estão instalados")
-
-        if not docker_disponivel():
-            raise unittest.SkipTest("Docker daemon não está disponível ou acessível")
-
-        cls.imagem = os.environ.get("TEST_DOCKER_IMAGE", DOCKER_IMAGE_PADRAO)
-        try:
-            cls.imagem = obter_ou_construir_imagem(cls.imagem)
-        except Exception as e:
-            raise unittest.SkipTest(f"Falha ao obter ou construir imagem Docker: {e}")
+            with closing(docker.from_env()) as client:
+                client.ping()
+                if requested_image is None:
+                    cls.imagem = obter_ou_construir_imagem(client, DOCKER_IMAGE_PADRAO)
+                else:
+                    if not requested_image.strip():
+                        raise ValueError("TEST_DOCKER_IMAGE must name a locally built image")
+                    client.images.get(requested_image)
+                    cls.imagem = requested_image
+        except Exception as error:
+            if requested_image is not None:
+                raise RuntimeError(f"Could not validate requested Docker image {requested_image!r}: {error}") from error
+            raise unittest.SkipTest(f"Optional Docker validation is unavailable: {error}") from error
 
     def test_container_web_dashboard_e_cli(self):
         from testcontainers.core.container import DockerContainer
@@ -103,9 +96,10 @@ class TestOmniRTKSyncContainer(unittest.TestCase):
                     corpo_healthz = resp.read().decode("utf-8")
                     cabecalho_server = resp.headers.get("Server", "")
             except urllib.error.HTTPError as e:
-                status_healthz = e.code
-                corpo_healthz = e.read().decode("utf-8")
-                cabecalho_server = e.headers.get("Server", "")
+                with e:
+                    status_healthz = e.code
+                    corpo_healthz = e.read().decode("utf-8")
+                    cabecalho_server = e.headers.get("Server", "")
 
             # Sem banco montado e sem gateway externo, o healthz esperado é 503 DATABASE_NOT_READY
             self.assertIn(status_healthz, (200, 503))
@@ -121,6 +115,32 @@ class TestOmniRTKSyncContainer(unittest.TestCase):
             texto_saida = saida.decode("utf-8")
             self.assertIn("omnirtksync", texto_saida.lower())
             self.assertIn("--daemon", texto_saida)
+
+
+class TestContainerPrerequisites(unittest.TestCase):
+    def test_optional_run_can_skip_missing_dependencies(self):
+        with patch.dict(os.environ, clear=True), patch.dict(sys.modules, {"testcontainers": None}):
+            with self.assertRaises(unittest.SkipTest):
+                TestOmniRTKSyncContainer.setUpClass()
+
+    def test_requested_image_cannot_skip_missing_dependencies(self):
+        with patch.dict(os.environ, {"TEST_DOCKER_IMAGE": "requested-image:test"}), patch.dict(
+            sys.modules, {"testcontainers": None}
+        ):
+            with self.assertRaisesRegex(RuntimeError, "requested-image:test"):
+                TestOmniRTKSyncContainer.setUpClass()
+
+    def test_requested_image_must_already_exist_locally(self):
+        docker = Mock()
+        client = docker.from_env.return_value
+        client.images.get.side_effect = LookupError("missing local image")
+        with patch.dict(os.environ, {"TEST_DOCKER_IMAGE": "requested-image:test"}), patch.dict(
+            sys.modules, {"docker": docker, "testcontainers": Mock()}
+        ):
+            with self.assertRaisesRegex(RuntimeError, "missing local image"):
+                TestOmniRTKSyncContainer.setUpClass()
+        client.images.get.assert_called_once_with("requested-image:test")
+        client.images.build.assert_not_called()
 
 
 if __name__ == "__main__":

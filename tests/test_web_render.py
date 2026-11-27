@@ -281,14 +281,14 @@ class TestDashboardOverHttp(unittest.TestCase):
             )
 
         cls.settings = Settings(
-            db_path=cls.db_path, web_host="127.0.0.1", web_port=19393,
+            db_path=cls.db_path, web_host="127.0.0.1", web_port=0,
             dashboard_user="admin", dashboard_password="senha-forte",
             dashboard_auth_from_env=True,
         )
         cls.server = web_server.start_web_server(
-            "127.0.0.1", 19393, cls.db_path, omniroute_url="", settings=cls.settings
+            "127.0.0.1", 0, cls.db_path, omniroute_url="", settings=cls.settings
         )
-        time.sleep(0.3)
+        cls.base_url = f"http://127.0.0.1:{cls.server.server_port}"
         cls.auth = base64.b64encode(b"admin:senha-forte").decode()
 
     @classmethod
@@ -298,7 +298,7 @@ class TestDashboardOverHttp(unittest.TestCase):
         cls.tmp_dir.cleanup()
 
     def _get(self, path: str):
-        req = urllib.request.Request(f"http://127.0.0.1:19393{path}")
+        req = urllib.request.Request(f"{self.base_url}{path}")
         req.add_header("Authorization", f"Basic {self.auth}")
         return urllib.request.urlopen(req, timeout=5)
 
@@ -315,7 +315,7 @@ class TestDashboardOverHttp(unittest.TestCase):
 
     def test_unauthenticated_access_is_rejected(self):
         with self.assertRaises(urllib.error.HTTPError) as ctx:
-            urllib.request.urlopen("http://127.0.0.1:19393/", timeout=5)
+            urllib.request.urlopen(f"{self.base_url}/", timeout=5)
         self.assertEqual(ctx.exception.code, 401)
 
     def test_flash_message_is_rendered_from_the_query_string(self):
